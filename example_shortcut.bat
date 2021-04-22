@@ -1,0 +1,1 @@
+"C:\Program Files\R\R-4.0.2\bin\R.exe" -e "shiny::runApp('D:/performance_monitor/performance_monitor_viewer', launch.browser = TRUE)"
