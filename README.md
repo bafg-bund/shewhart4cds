@@ -1,2 +1,2 @@
 # ntscontrol
-Interactive control cards to monitor LS-MS performance
+Interactive control cards to monitor LC-HRMS/MS performance
