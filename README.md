@@ -7,7 +7,7 @@ Publicly funded project at the German Federal Institute of Hydrology with fundin
 from the Federal Environmental Agency (FKZ 3717222300)
 
 ## Installation
-Clone the repository to a local folder. 
+Clone/copy the repository to a local directory. 
 
 ### Requirements
 
@@ -27,8 +27,8 @@ Currently, only Sciex Analyst CDS calibration data can be read.
 
 ### Usage with Sciex Analyst software
 Export CDS calibration data by opening a cds calibration file in Analyst. View
-mass spectra and right-click to export peaks as text. Save the tab-demilited
-file in the corresponding folder under `calibration_data`. The name of the file
+mass spectra and right-click to export peaks as text. Save the tab-delimited
+file in the corresponding directory under `calibration_data`. The name of the file
 is irrelevent.
 
 Open the shiny app `performance_monitor_viewer/app.R` to view the data (example
