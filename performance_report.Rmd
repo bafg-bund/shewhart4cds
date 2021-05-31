@@ -1,0 +1,73 @@
+---
+output: html_document
+params:
+  instrumentName: NA
+  dateRange: NA
+  polarity: NA
+  msLevel: NA
+  intenHist: NA
+  intenTrend: NA
+  mzHist: NA
+  mzTrend: NA
+  resHist: NA
+  resTrend: NA
+  intenType: NA
+  mzType: NA
+---
+
+```{r, echo=FALSE}
+intenTypes <- c("cps" = "intensity_cps",  "relative" = "intensity_rel", "corrected" = "intensity_corr_cps")
+mzTypes <- c("mDa" = "mDa_error_after_cal", "ppm" = "ppm_error_after_cal")
+```
+
+
+# Performance Report `r params$instrumentName`
+*`r format(Sys.time(), "%Y-%m-%d %H:%M")`*
+
+**Start:** `r format(params$dateRange[1], "%Y-%m-%d %H:%M")` | **End** `r format(params$dateRange[2], "%Y-%m-%d %H:%M")` (*latest*) | `r params$msLevel`-`r params$polarity`
+
+#### Trend and distribution of average intensities (type: `r names(intenTypes[intenTypes == params$intenType])`)
+```{r, echo=FALSE, fig.width=10, fig.height=1.5}
+plot1t <- params$intenTrend
+plot1t <- plot1t + theme_grey(10) + theme(
+  strip.background = element_blank(),
+  strip.text.x = element_blank()
+)
+plot1t
+```
+```{r, echo=FALSE, fig.width=10, fig.height=1.5}
+plot1d <- params$intenHist
+plot1d <- plot1d + theme_grey(10) 
+plot1d
+```
+
+#### Trend and distribution of average m/z shifts (type: `r names(mzTypes[mzTypes == params$mzType])`)
+```{r, echo=FALSE, fig.width=10, fig.height=1.5}
+plot2t <- params$mzTrend
+plot2t <- plot2t + theme_grey(10) + theme(
+  strip.background = element_blank(),
+  strip.text.x = element_blank()
+)
+plot2t
+```
+```{r, echo=FALSE, fig.width=10, fig.height=1.5}
+plot2d <-params$mzHist
+plot2d <- plot2d + theme_grey(10)
+plot2d
+```
+
+#### Trend and distribution of average resolutions
+```{r, echo=FALSE, fig.width=10, fig.height=1.5}
+plot3t <- params$resTrend
+plot3t <- plot3t + theme_grey(10) + theme(
+  strip.background = element_blank(),
+  strip.text.x = element_blank()
+)
+plot3t
+```
+```{r, echo=FALSE, fig.width=10, fig.height=1.5}
+plot3d <-params$resHist
+plot3d <- plot3d + theme_grey(10)
+plot3d
+```
+

@@ -250,6 +250,26 @@ ui <- fluidPage(
                  ),
         tabPanel("Resolution", 
                  fluidRow(plotOutput("width")), fluidRow(plotOutput("widthHist"))
+                 ),
+        tabPanel("Report Download",
+                 fluidRow(
+                   column(4, radioButtons("reportIntenType", "Intensity type", 
+                                         c("cps" = "intensity_cps", 
+                                           "relative" = "intensity_rel", 
+                                           "corrected" = "intensity_corr_cps"), 
+                                         selected = "intensity_cps",
+                                         inline = TRUE))
+                   
+                 ),
+                 fluidRow(
+                   column(4, radioButtons("reportMzType", "m/z shift type", 
+                                          c("mDa" = "mDa_error_after_cal", 
+                                            "ppm" = "ppm_error_after_cal"), 
+                                          selected = "ppm_error_after_cal",
+                                          inline = TRUE))
+                   
+                 ),
+                 fluidRow(column(2, downloadButton("report", "Generate report")))
                  )
       )
     )
@@ -294,6 +314,49 @@ server <- function(input, output, session) {
    output$width <- renderPlot(makeTrendPlot(dat(), fixDates(input$dates), "resolution"))
    output$widthHist <- renderPlot(makeBellCurve(dat(), fixDates(input$dates), "resolution", 
                                                 input$pol, input$ms))
+   
+   output$report <- downloadHandler(
+     # For PDF output, change this to "report.pdf"
+     filename = sprintf("%s_performance_report_%s.html", format(Sys.time(), "%y%m%d"), instrumentName),
+     content = function(file) {
+       # Copy the report file to a temporary directory before processing it, in
+       # case we don't have write permissions to the current working dir (which
+       # can happen when deployed).
+       tempReport <- file.path(tempdir(), "performance_report.Rmd")
+       file.copy("../performance_report.Rmd", tempReport, overwrite = TRUE)
+       #browser()
+       # Set up parameters to pass to Rmd document
+       
+       trendPlotInten <- makeTrendPlot(dat()[dat()$target == "mean", ], fixDates(input$dates), input$reportIntenType)
+       trendPlotMz <- makeTrendPlot(dat()[dat()$target == "mean", ], fixDates(input$dates), input$reportMzType)
+       trendPlotRes <- makeTrendPlot(dat()[dat()$target == "mean", ], fixDates(input$dates), "resolution")
+       
+       params <- list(instrumentName = instrumentName,
+                      dateRange = fixDates(input$dates),
+                      polarity = input$pol,
+                      msLevel = input$ms,
+                      intenHist = makeBellCurve(dat(), fixDates(input$dates), input$reportIntenType, 
+                                                input$pol, input$ms),
+                      intenTrend = trendPlotInten,
+                      mzHist = makeBellCurve(dat(), fixDates(input$dates), input$reportMzType, 
+                                             input$pol, input$ms),
+                      mzTrend = trendPlotMz,
+                      resHist = makeBellCurve(dat(), fixDates(input$dates), "resolution", 
+                                                         input$pol, input$ms),
+                      resTrend = trendPlotRes,
+                      intenType = input$reportIntenType,
+                      mzType = input$reportMzType
+                      )
+       
+       # Knit the document, passing in the `params` list, and eval it in a
+       # child of the global environment (this isolates the code in the document
+       # from the code in this app).
+       rmarkdown::render(tempReport, output_file = file,
+                         params = params,
+                         envir = new.env(parent = globalenv())
+       )
+     }
+   )
 }
 
 shinyApp(ui = ui, server = server)
